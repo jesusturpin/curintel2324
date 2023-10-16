@@ -1,0 +1,54 @@
+---
+title: "SAA Práctica 0: Resumen estadístico con TOP TRUMPS"
+author: "Jesús Turpín"
+format: html
+editor: visual
+---
+
+# Requisitos previos:
+
+-   Para la realización de la práctica, es necesario haber estudiado la sección "[resumen estadístico](https://rpubs.com/jesusturpin/saa_intro_stats_01)"
+
+-   Organizad 3 grupos según el fichero: [datos curintel](https://docs.google.com/spreadsheets/d/1lJr0pGDLTD1est0FY9bcOaDgnTNa1Wa9u44PNqp6Bv4/edit?usp=sharing)
+
+# 1. Creación del dataset
+
+Cread una hoja de cálculo e introducid los datos de las 30 cartas top trumps. Recomendación: trabajo colaborativo
+
+1.1 Añadir entre 1 y 5 variables categóricas, por ejemplo: raza o especie, sexo, rol, etc.
+
+1.2 Exportad el archivo como csv con 3 filas, los datos numéricos originales y los datos categóricos extra.
+
+1.3 Compartid el fichero con el profesor y con vuestros compañeros
+
+# 2. Documento quarto
+
+Crea un documento .qmd y ve creando y documentando el trabajo. Puedes usar como plantilla este documento.
+
+# 3. Análisis exploratorio
+
+3.1 Crea un data frame a partir del fichero csv
+
+3.2 Crea un histograma para cada una de las variables y explica brevemente la distribución de los datos. Utiliza los parámetros bins o binwidth apropiadamente teniendo en cuenta el tamaño del dataset.
+
+3.3 Calcula la media y la mediana para todas las variables numéricas.
+
+3.4 Calcula la moda para todas las variables numéricas y categóricas
+
+3.5 Dibuja un diagrama de tarta para todas las variables categóricas
+
+3.6 ¿Qué variable numérica presenta mayor varianza?
+
+3.7 Calcula el rango para todas las variables numéricas
+
+3.8 Calcula el IQR para todas las variables numéricas
+
+3.9 Averigua manualmente, a partir del IQR si existen Outliers
+
+3.10 Representa en una sola gráfica, los diagramas de caja y bigote de todas las variables numéricas
+
+# 4. Análisis exploratorio: Filtros por categorías
+
+Repite el apartado 3.10 filtrando por categorías y explica las diferencias obtenidas
+
+# 5. Realiza dos nuevos documentos para las otras cartas, a partir de los csv generados por los otros grupos
