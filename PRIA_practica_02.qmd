@@ -1,0 +1,204 @@
+---
+title: "PRIA practica 2: Entorno, sintaxis RBase y estructuras de datos, y funciones"
+author: "Jesús Turpín"
+date: "2023-10-24"
+format: html
+editor: visual
+toc: true
+toc-depth: 2
+---
+
+# 1. Administración del entorno
+
+Limpia previamente tu espacio de trabajo. Crea un archivo qmd, desde cero, copiando el enunciado de cada ejercicio e incrustando el código R y las salidas.
+
+1.1. La función *ls()*:
+
+```{r}
+mi_var1 <-1
+mi_var2 <- "dos"
+mi_var3 <- "III"
+```
+
+Indica la opción correcta:
+
+a)  Lista el contenido del directorio de trabajo
+
+b)  Es la abreviatura de list sort y ordena la lista de variables
+
+c)  Genera código R automáticamente (function name, pos =-1...")
+
+d)  Listará todas las variables y funciones almacenadas en el entorno global (tu sesión de trabajo en R)
+
+1.2. Para crear variables ocultas, el nombre de la variable debe comenzar con un ".".
+
+```{r}
+.var_oculta <- "no me ves"
+.var_oculta
+```
+
+Utiliza la función apropiada para listar variables de tu entorno. Averigua cómo mostrar variables ocultas.
+
+Crea un vector v_rnd con 3 elementos numéricos enteros aleatorios de 1 a 3. Utiliza la función *sample()*
+
+```{r eval=FALSE}
+v_rnd <-
+```
+
+Vuelve a listar las variables ocultas y observa qué ha ocurrido. Trata de explica a qué se debe.
+
+1.3. Para poder usar ciertas librerías, es necesario tenerlas instaladas y cargarlas en nuestro script. Aunque ya se ha hecho dentro de R studio, por ejemplo para poder generar y visualizar rmarkdown, conviene tener en cuenta los comandos necesarios para instalar los paquetes, especialmente cuando se lleva un script a producción. Instala el paquete "gapminder" en tu entorno.
+
+```{r eval=FALSE}
+# Installa el paquete gapminder
+```
+
+Carga la librería *gapminder* en tu script
+
+```{r eval=FALSE}
+# Carga la librería gapminder
+```
+
+1.4. Directorios en R. La función getwd() permite obtener nuestro directorio de trabajo. Comprueba tu directorio de trabajo. Si vas a trabajar normalmente en ese directorio, crea una variable de entorno en tu sistema operativo con ese directorio. Imagina que has subido a producción tu código a una máquina virtual cloud con linux. ¿Cómo harías para que tu código fuente no cambie y establecer tu entorno de trabajo desde la variable de entorno?
+
+1.5. Lista las variables de entorno de tu sistema:
+
+1.6. Con el comando sink("fichero.txt"), le indicas a R que escriba la salida por fichero en lugar de por el terminal. Volviendo a llamar a sink(), sin parámetros, termina y cierra el fichero y vuelve a mostrar las salidas por el terminal. Imprime los últimos 10 comandos que escribiste en R en un fichero.
+
+1.7. Guarda el espacio de trabajo con la función save.image("mi_espacio.RData"). Borra el historial y todas las variables y a continuación, carga el espacio de trabajo en tu versión linux de R.
+
+# 2. Estructuras de datos. Repaso
+
+2.1. Repaso Factores. Crea el factor fcalif, teniendo en cuenta el orden de los niveles indicados y las etiquetas dadas.
+
+```{r eval=FALSE}
+notas <- c(3, 0, 4, 6, 8, 10, 9, 8, 7, 7, 6, 7, 5)
+calificaciones <- c("S","S","S","A","N","MH","Sb","N","N","N","A","N","A")
+niveles = c("S", "A", "N", "Sb", "MH")
+etiquetas = c("Suspenso", "Aprobado", "Notable", "Sobresaliente", "Matrícula de Honor")
+fcalif <-
+```
+
+2.2. Con los datos anteriores, saca el promedio de notas de los alumnos con suspenso, aprobado y notable usando la sintaxis RBase: *vector\[expresión_filtro\]*
+
+```{r eval=FALSE}
+#suspensos:
+mean(...)
+#aprobados
+mean(...)
+#notables
+mean(...)
+```
+
+2.3. Trabajando con data frames. Al haber cargado la librería "gapminder", escribe el comando gapminder y podrás ver la estructura del data frame. ¿Cuántas observaciones (filas) tiene el dataset? a) 6 b) 1694 c) 1704 d) 10
+
+2.4. Data frames de ejemplo en R. Utiliza las funciones head y tail para:
+
+```{r eval=FALSE}
+mtcars
+# Imprime las 2 primeras filas
+
+# Imprime las 10 últimas filas
+
+```
+
+2.5. Utilizando una única función, analiza la estructura del dataframe mtcars e indica: Nº total de observaciones: Nº total de variables: Tipo de cada variable:
+
+2.6. Crea un data frame con la estructura de la tabla "meses" a partir de los siguientes vectores:
+
+```{r eval=FALSE}
+mesid <- 1:12
+# Completa hasta los 12 meses
+mesnombre <- c("Enero", "Febrero",...)
+# Utiliza substr para generar los nombres de cada mes con los 3 primeros caracteres de mesnombre
+mescorto <-
+mesesdf <- 
+```
+
+2.7. Crea otro data frame con las 4 columnas y la estructura de la tabla "dias_semana"
+
+```{r eval=FALSE}
+diasemanaid <- 1:7
+diasemananombre <-
+diasemananombrecorto <-
+diasemanaletra <-
+
+diasemanadf <- 
+  
+```
+
+2.8. Añade al dataframe dias_semana una quinta columna con valores lógicos "esFestivo", indica TRUE para los domingos y false para el resto. Utiliza el comparador "==" para ello.
+
+2.9. La función list() permite crear listas. A partir de los tres vectores siguientes, crea una lista
+
+```{r eval=FALSE}
+mi_vector <-1:20
+mi_matriz <-matrix(1:9,ncol=3,byrow=TRUE)
+mi_df <- mtcars[1:5,]
+mi_lista <-
+```
+
+2.10. A partir del vector de nombres dado, utiliza la función names() para nombrar los elementos de la lista anterior e imprime la lista
+
+```{r eval = FALSE}
+v_nombres <- c("Vec", "Mat", "Df")
+
+...
+
+mi_lista
+```
+
+2.11. Tanto en listas como en data frames, es común referirse a la posición del elmento o a la columna respectivamente, usando el símbolo mi_lista \$nombre_elemento ó mi_df\$nombre_columna para acceder a los datos de los elementos o columnas. Teniendo en cuenta que tienen nombres, imprime el elemento 7º del vector "Vec" de la lista. Sustituye su valor por 77 y vuelve a imprimir la lista completa.
+
+2.12. A partir de los datos del dataframe contenido en mi_lista encuentra e imprime el valor "mpg" para el Datsun 710
+
+2.13. A partir de los datos del dataframe mi_lista, extrae, usando subset(), los vehículos con 6 cyl y 4 gear. Haz lo mismo pero imprime solamente wt y qsec. Añade el parámetro select a subset().
+
+2.14. Utilizando el dataframe, extrae 100 muestras aleatorias sin repetición. Hazo en una sola línea.
+
+```{r eval=FALSE}
+muestras_gm <- gapminder[tu_codigo,] # Utiliza sample() y nrow() para extraer las muestras
+```
+
+# 3. Funciones
+
+Teoría y ejemplos en:
+
+-   <a href="https://www.w3schools.com/r/r_functions.asp" target="_blank">Funciones W3Schools</a>
+
+-   <a href="https://es.r4ds.hadley.nz/19-functions.html" target="_blank">Funciones R4DS</a>
+
+3.1 Sea $a x^2 + b x + c = 0$ la ecuación y $x = \frac {-b \pm \sqrt {b^2 - 4ac}}{2a}$ la solución a la misma, crea una función que reciba como parámetros a, b y c y devuelva 2 si tiene 2 soluciones reales. 1 si tiene una solución real, 0 si no tiene solución real o NA si a = 0.
+
+```{r eval=FALSE}
+ec_2grado_tipo <- funcion(a,b,c) {
+
+}
+ec_2grado_tipo(a=2,b=5,c=0)
+ec_2grado_tipo(a=1,b=2,c=1)
+ec_2grado_tipo(a=1,b=2,c=3)
+ec_2grado_tipo(a=0,b=2,c=0)
+```
+
+3.2 Escribe una función, que sirviéndose de la anterior, resuelva la ecuación en el campo de los números reales. Considera la salida un vector de 2 elementos numéricos
+
+```{r eval=FALSE}
+ec_2grado_solr <- funcion(a,b,c) {
+
+}
+ec_2grado_solr(a=2,b=5,c=0)
+ec_2grado_solr(a=1,b=2,c=1)
+ec_2grado_solr(a=1,b=2,c=3)
+ec_2grado_solr(a=0,b=2,c=0)
+```
+
+3.3 Cuando no tiene solución real, considera utilizar los números complejos y escribe una función que resuelva cualquier tipo de ecuación, aunque tenga solución con números complejos. R dispone de herramientas para ello. Ayuda *sqrt(as.complex(-1))* Considera la salida un vector de 2 elementos numéricos o complejos.
+
+```{r eval=FALSE}
+ec_2grado <- funcion(a,b,c) {
+ec_2grado(a=2,b=5,c=0)
+ec_2grado(a=1,b=2,c=1)
+ec_2grado(a=1,b=0,c=1)
+ec_2grado(a=0,b=2,c=0)
+}
+```
