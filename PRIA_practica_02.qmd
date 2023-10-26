@@ -171,7 +171,7 @@ Teoría y ejemplos en:
 3.1 Sea $a x^2 + b x + c = 0$ la ecuación y $x = \frac {-b \pm \sqrt {b^2 - 4ac}}{2a}$ la solución a la misma, crea una función que reciba como parámetros a, b y c y devuelva 2 si tiene 2 soluciones reales. 1 si tiene una solución real, 0 si no tiene solución real o NA si a = 0.
 
 ```{r eval=FALSE}
-ec_2grado_tipo <- funcion(a,b,c) {
+ec_2grado_tipo <- function(a,b,c) {
 
 }
 ec_2grado_tipo(a=2,b=5,c=0)
@@ -183,7 +183,7 @@ ec_2grado_tipo(a=0,b=2,c=0)
 3.2 Escribe una función, que sirviéndose de la anterior, resuelva la ecuación en el campo de los números reales. Considera la salida un vector de 2 elementos numéricos
 
 ```{r eval=FALSE}
-ec_2grado_solr <- funcion(a,b,c) {
+ec_2grado_solr <- function(a,b,c) {
 
 }
 ec_2grado_solr(a=2,b=5,c=0)
@@ -195,7 +195,7 @@ ec_2grado_solr(a=0,b=2,c=0)
 3.3 Cuando no tiene solución real, considera utilizar los números complejos y escribe una función que resuelva cualquier tipo de ecuación, aunque tenga solución con números complejos. R dispone de herramientas para ello. Ayuda *sqrt(as.complex(-1))* Considera la salida un vector de 2 elementos numéricos o complejos.
 
 ```{r eval=FALSE}
-ec_2grado <- funcion(a,b,c) {
+ec_2grado <- function(a,b,c) {
 ec_2grado(a=2,b=5,c=0)
 ec_2grado(a=1,b=2,c=1)
 ec_2grado(a=1,b=0,c=1)
