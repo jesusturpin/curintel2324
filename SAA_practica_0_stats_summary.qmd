@@ -1,8 +1,11 @@
 ---
 title: "SAA Práctica 0: Resumen estadístico con TOP TRUMPS"
+date: 2023-10-17
 author: "Jesús Turpín"
 format: html
 editor: visual
+toc: true
+toc-depth: 2
 ---
 
 # Requisitos previos:
@@ -23,7 +26,7 @@ Cread una hoja de cálculo e introducid los datos de las 30 cartas top trumps. R
 
 # 2. Documento quarto
 
-Crea un documento .qmd y ve creando y documentando el trabajo. Puedes usar como plantilla este documento.
+Crea un documento .qmd y ve creando y documentando el trabajo. Puedes usar como plantilla [este documento](https://github.com/jesusturpin/curintel2324/).
 
 # 3. Análisis exploratorio
 
@@ -51,4 +54,6 @@ Crea un documento .qmd y ve creando y documentando el trabajo. Puedes usar como 
 
 Repite el apartado 3.10 filtrando por categorías y explica las diferencias obtenidas
 
-# 5. Realiza dos nuevos documentos para las otras cartas, a partir de los csv generados por los otros grupos
+# 5. Otros datasets.
+
+Realiza dos nuevos documentos para las otras cartas, a partir de los csv generados por los otros grupos
