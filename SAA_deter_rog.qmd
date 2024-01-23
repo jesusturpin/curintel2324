@@ -1,0 +1,329 @@
+---
+title: "Unidad 3(RLog): Determinación de Sistemas de Aprendizaje automático"
+subtitle: "Regresión Logística"
+autor: "Jesús Turpín"
+format:
+  html:
+    code-fold: true
+editor: visual
+toc: true
+toc-depth: 3
+bibliography: SAA_U3_refs.bib
+---
+
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(bayesQR)
+library(broom)
+library(corrplot)
+library(yardstick)
+library(pROC)
+#library(ggrepel)
+# library(purrr)
+library(plotly)
+```
+
+## Algoritmos de Machine Learning
+
+-   Regresión Lineal
+
+-   **Regresión Logística**
+
+-   Árboles de Decisión
+
+-   k Nearest Neighbor
+
+-   SVM
+
+-   Naive Bayes
+
+-   Clustering jerárquico
+
+-   K-Means
+
+-   PCA
+
+-   Redes Neuronales
+
+-   Aprendizaje profundo
+
+## ¿Qué es la regresión logística?
+
+Esta introducción ha sido extraída del texto @adymeR.
+
+La regresión logística es el conjunto de modelos estadísticos utilizados cuando se desea conocer la relación entre:
+
+-   Una *variable dependiente cualitativa*, dicotómica (regresión logística binaria o binomial) o con más de dos categorías (regresión logística multinomial).
+
+-   Una o más variables explicativas, llamadas covariables, ya sean cualitativas o cuantitativas.
+
+Las covariables cualitativas deben ser dicotómicas, tomando valor 0 para su ausencia y 1 para su presencia. Si la covariable tuviera más de dos categorías debemos realizar una transformación de la misma en varias covariables cualitativas dicotómicas ficticias (variables dummy). Al hacer esta transformación cada categoría de la variable entraría en el modelo de forma individual.
+
+Los modelos de regresión logística tienen tres finalidades:
+
+-   Cuantificar la importancia de la relación existente entre cada una de las covariables y la variable dependiente.
+
+-   Clarificar la existencia de interacción y confusión entre covariables respecto a la variable dependiente (es decir, los odds ratio para cada covariable).
+
+-   Clasificar individuos dentro de las categorías (presente/ausente) de la variable dependiente.
+
+Por tanto, el objetivo de la regresión logística no es, como en regresión lineal, predecir el valor de la variable $Y$ a partir de una o varias variables predictoras ($X_s$), sino que queremos predecir la probabilidad de que ocurra Y conocidos los valores de las variables $X_s$. La ecuación general es de la forma:
+
+$$\begin{equation}    P(Y) = \frac{1}{1 + e^{-(b_0 + b_1 X_1 + b_2 X_2 + \dots + b_n X_n)}}\end{equation}$$ En su forma más sencilla, cuando tenemos sólo una variable predictora $X_1$, la ecuación de la regresión logística (simple) viene dada por:
+
+$$\begin{equation}    P(Y) = \frac{1}{1 + e^{-(b_0 + b_1 X_1)}}\end{equation}$$
+
+Los valores posibles de estas ecuaciones varían entre 0 y 1. Un valor cercano a 0 significa que es muy improbable que Y haya ocurrido, y un valor cercano a 1 significa que es muy probable que tuviese lugar.
+
+Como en la regresión lineal cada variable predictora de la ecuación logística tiene su propio coeficiente. Los valores de los parámetros se estiman utilizando el [*método de máxima verosimilitud*](https://es.wikipedia.org/wiki/M%C3%A1xima_verosimilitud) que selecciona los coeficientes que hacen más probable que los valores observados ocurran.
+
+@FAVERO2023259
+
+### Ejemplo Regresión logística simple (binaria)
+
+El dataset de ejemplo es sobre una compañía de servicios financieros. Los datos se encuentran en la librería `bayesQR`.
+
+```{r}
+#| code-fold: false
+# Cargamos los datos
+data(Churn) #bayesQR
+```
+
+```{r}
+glimpse(Churn)
+```
+
+Hay 400 filas y cada fila representa un cliente. Los datos que vamos a utilizar como predictores son el tiempo desde la primera compra (`lor` - length of relationship) y el tiempo desde la última compra (`recency` - recency of activity). La variable de respuesta será `churn`, es decir si el cliente ha abandonado la compañía. Los datos de tiempo están normalizados por z-score, con lo que no representan unidades de tiempo y por supuesto, hay valores negativos.
+
+```{r}
+Churn %>%
+  cor() %>%
+  corrplot(method = "number")
+```
+
+## Modelo lineal simple: churn vs recency
+
+La variable de respuesta `churn` en función de `recency`:
+
+```{r}
+#| code-fold: false
+mdl_churn_vs_recency_lm <- lm(churn ~ recency, Churn)
+summary(mdl_churn_vs_recency_lm)
+```
+
+```{r warning=FALSE, message=FALSE}
+ggplot(Churn, aes(recency, churn, color = churn)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_bw()
+```
+
+```{r warning=FALSE, message=FALSE}
+ggplot(Churn, aes(recency, churn, color = churn)) +
+  geom_jitter(height = 0.1, alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_bw()
+```
+
+Obviamente, la variable de respuesta no puede ser un número decimal. Lo que nos da el modelo de regresión lineal, realmente no son las predicciones, sino la probabilidad de que el cliente abandone o no la compañía, en función del tiempo transcurrido desde la última actividad. A mayor tiempo transcurrido, más probable que el cliente haya abandonado.
+
+Si sustituimos geom_smooth por abline y modificamos los límites de los ejes, vemos la gráfica desde fuera, para ver la línea de tendencia completa:
+
+```{r}
+coeffs <- coefficients(mdl_churn_vs_recency_lm)
+intercept <- coeffs[1]
+slope <- coeffs[2]
+
+ggplot(Churn, aes(recency, churn, color = churn)) +
+  geom_point(alpha = 0.1) +
+  geom_abline(intercept = intercept, slope = slope) +
+  xlim(-10, 10) +
+  ylim(-0.2, 1.2) +
+  theme_bw()
+```
+
+## Modelo lineal generalizado: `glm()`
+
+```{r}
+#| code-fold: false
+glm(churn ~ recency, Churn, family = gaussian)
+```
+
+El término `family` indica la distribución de los residuos del modelo.
+
+Para un modelo de regresión logística binaria, usaremos `binomial`
+
+```{r}
+#| code-fold: false
+mdl_churn_vs_recency_glm_bin <- glm(churn ~ recency, Churn, family = binomial)
+mdl_churn_vs_recency_glm_bin
+```
+
+## Predicciones como probabilidad
+
+Es importante especificar en las predicciones el atributo type = "response"
+
+```{r}
+#| code-fold: false
+explanatory_data <- data.frame(recency = -10:10)
+predicted <- explanatory_data %>%
+              mutate(churn_probability = predict(mdl_churn_vs_recency_glm_bin,
+                                               newdata = ., type = "response"),
+                     churn_log_odds =  predict(mdl_churn_vs_recency_glm_bin,
+                                               newdata = .))
+```
+
+```{r}
+head(predicted)
+```
+
+```{r}
+plt <- ggplot(Churn) +
+  geom_point(data = Churn, aes(recency, churn, color = churn), alpha = 0.1) +
+  geom_line(data = predicted, aes(recency, churn_probability), color = "blue") +
+  geom_point(data = predicted, aes(recency, churn_probability), color = "blue") +
+  theme_bw()
+plt
+```
+
+## De probabilidades a predicción de churn: el más probable
+
+Se escoge arbitrariamente un valor límite a partir del cual consideraremos churn o no churn. De momento y por simplificar, diremos que es 0.5, si la probabilidad de churn \> 0.5 churn_predicted = 1
+
+```{r}
+predicted <- predicted %>%
+  mutate(churn_predicted = round(churn_probability))
+plt <- plt +
+  geom_point(data = predicted, aes(recency, churn_predicted), color = "brown", alpha = 0.5)
+ plt
+```
+
+## Ratios de probabilidad y relación con los coeficientes
+
+$$odds\_ratio = \frac{p}{1-p}$$ $$\log\left(\frac{1 - p}{p}\right) = \beta_0 + \beta_1X$$
+
+Exponenciando ambos lados para eliminar el logaritmo:
+
+$$\frac{p}{1 - p} = e^{\beta_0 + \beta_1X}$$
+
+Resolver para p:
+
+$$p = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1X}}\quad \text{o de forma equivalente} \quad
+p = \frac{1}{1 + e^{-(\beta_0 + \beta_1X)}}$$
+
+```{r}
+predicted <- predicted %>%
+  mutate(churn_odds_ratio = churn_probability/(1-churn_probability)) 
+predicted
+```
+
+## Cuantificando el ajuste del modelo: matriz de confusión
+
+-   TP: True Positive. La predicción es correcta y el resultado es 1.
+
+-   TN: True Negative. La predicción es correcta y el resultado es 0.
+
+-   FP: False Positive. Predicción fallida y resultado real = 0 vs predicción = 1.
+
+-   FN: False Negative. Predicción fallida y resultado real = 1 vs predicción = 0.
+
+[![](https://victoryepes.blogs.upv.es/files/2015/02/B-DERsTIQAAgORN.png){fig-alt="Meme FALSE POSITIVE"}](https://victoryepes.blogs.upv.es/files/2015/02/B-DERsTIQAAgORN.png)
+
+Si el modelo es multinomial o multiclase, la matriz de confusión se hace más compleja.
+
+```{r}
+#| code-fold: false
+# Matriz de confusión manual:
+real_churn <- Churn$churn
+predicted_churn <- round(fitted(mdl_churn_vs_recency_glm_bin))
+
+outcomes <- table(predicted_churn, real_churn)
+
+```
+
+```{r}
+#| code-fold: false
+confusion <- conf_mat(outcomes)
+autoplot(confusion)
+```
+
+## Métricas
+
+```{r}
+#| code-fold: false
+summary(confusion, event_level = "second") # el atributo es para considerar positivos
+```
+
+-   **Exactitud (Accuracy)**: Es una medida general de cuántas predicciones fueron correctas. Un modelo es generalmente mejor cuando la exactitud es alta. $\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}$
+
+-   **Sensibilidad (Sens)**: También conocida como tasa de verdaderos positivos o recall. Indica la proporción de casos positivos reales que fueron correctamente identificados por el modelo. Una sensibilidad alta es preferible, especialmente en situaciones donde no detectar los casos positivos (como enfermedades) es crítico. $\text{Recall} = \frac{TP}{TP + FN}$
+
+-   **Especificidad (Spec)**: También conocida como tasa de verdaderos negativos. Muestra la proporción de casos negativos reales que fueron correctamente identificados. Al igual que con la sensibilidad, una especificidad alta es generalmente mejor, particularmente en situaciones donde los falsos positivos son problemáticos. $\text{Specificity} = \frac{TN}{TN + FP}$
+
+### ROC Área bajo la curva (AUC)
+
+**ROC**: La curva ROC es un gráfico que muestra el rendimiento de un modelo de clasificación en todos los umbrales de clasificación posibles. Esta curva traza dos parámetros: la Tasa de Verdaderos Positivos (Sensibilidad o Recall) en el eje Y y la Tasa de Falsos Positivos (1 - Especificidad) en el eje X.
+
+**Cómo se usa**: Al cambiar el umbral de decisión (**cutoff**) para la clasificación (el punto en el que decidimos clasificar un resultado como positivo o negativo), la Sensibilidad y la Especificidad del modelo cambiarán, creando un trazado en el gráfico. Esta curva proporciona una medida clara de la compensación entre Sensibilidad y Especificidad en diferentes umbrales, y es especialmente útil cuando las clases están desequilibradas.
+
+**Qué se necesita para crearla**: necesitamos el vector de la variable de respuesta y un vector de probabilidades.
+
+**AUC**: es una métrica que resume la curva ROC en un solo valor, calculando el área bajo la curva ROC. El valor de AUC varía entre 0 y 1. Un modelo con un AUC de 0.5 no tiene capacidad discriminativa y es equivalente a una decisión aleatoria. Un modelo perfecto tiene un AUC de 1.0, donde identifica correctamente todos los verdaderos positivos y verdaderos negativos. Por lo tanto, cuanto más alto sea el valor del AUC, mejor será el modelo en la diferenciación entre las clases positivas y negativas.
+
+```{r warning=FALSE, message=TRUE}
+#| code-fold: false
+ROC <- roc(Churn$churn, fitted(mdl_churn_vs_recency_glm_bin))
+```
+
+```{r}
+#| code-fold: false
+plot(ROC, col = "blue")
+```
+
+```{r}
+auc(ROC)
+```
+
+## Ejercicio 1: Regresión logística simple
+
+Repite todos los pasos usando como variable explicativa lor. ¿Qué modelo obtiene mejores resultados en términos de exactitud y AUC?
+
+## Ejercicio 2: Regresión logística múltiple
+
+Cuando usamos dos o más variables predictoras, las visualizaciones se complican. La función ya no es una sigmoide con un par de coeficientes, sino que al igual que ocurre con la regresión lineal múltiple, se convierten en gráficas de superficie en el espacio o fórmulas más complejas que no tiene sentido representar gráficamente. Además pueden aparecer interacciones, lo cual complica aún más el modelo añadiendo más coeficientes.
+
+```{r echo=FALSE}
+# Cargar las librerías necesarias
+library(ggplot2)
+library(plotly)
+
+# Asumiendo que tu modelo se ha ajustado con la fórmula churn ~ recency + lor
+mdl_churn <- glm(churn ~ recency * lor, data = Churn, family = binomial())
+
+# Genera una malla de valores para recency y lor
+recency_range <- seq(min(Churn$recency), max(Churn$recency), length.out = 100)
+lor_range <- seq(min(Churn$lor), max(Churn$lor), length.out = 100)
+grid <- expand.grid(recency = recency_range, lor = lor_range)
+
+# Calcula las probabilidades predichas por el modelo
+grid$churn_prob <- predict(mdl_churn, newdata = grid, type = "response")
+
+# Gráfico 3D
+plot <- plot_ly(grid, x = ~recency, y = ~lor, z = ~churn_prob, type = "mesh3d") %>%
+  layout(scene = list(
+    xaxis = list(title = 'Recency'),
+    yaxis = list(title = 'Length of Relationship (lor)'),
+    zaxis = list(title = 'Probability of Churn')
+  ))
+
+# Mostrar el gráfico
+plot
+
+
+```
+
+Crea un modelo usando las dos variables explicativas: lor y recency. Repite todos los pasos excepto las visualizaciones. Usa la fórmula `churn ~ recency+lor`
+
+## Ejercicio 3: Regresión logística múltiple
+
+Repite el ejercicio 2, usa la fórmula con interacciones
